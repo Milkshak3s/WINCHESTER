@@ -8,7 +8,7 @@ static int winchester_handler(request_rec *r);
 
 static void register_hooks(apr_pool_t *pool)
 {
-   ap_hook_post_read_request(winchester_handler, NULL, NULL, APR_HOOK_FIRST);
+   ap_hook_post_read_request(winchester_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
 }
 
 static int winchester_handler(request_rec *r)
@@ -21,7 +21,6 @@ static int winchester_handler(request_rec *r)
     }
 
     ap_rprintf(r, "Hooked post_read");
-    ap_rprintf(r, "%s", r->unparsed_uri);
 
 	return DONE;
 }
