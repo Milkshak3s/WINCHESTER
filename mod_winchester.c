@@ -8,19 +8,22 @@ static int winchester_handler(request_rec *r);
 
 static void register_hooks(apr_pool_t *pool)
 {
-   ap_hook_post_read_request(winchester_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
+   ap_hook_post_read_request(winchester_handler, NULL, NULL, APR_HOOK_FIRST);
 }
 
 static int winchester_handler(request_rec *r)
 {
-	if (!r->unparsed_uri || strcmp(r->unparsed_uri, "/test.help"))
+	if (!r->unparsed_uri || strcmp(r->unparsed_uri, "/test.backdoor"))
     {
-        ap_rprintf(r, "Hooked post_read");
+        ap_rprintf(r, "Hooked, but failed if");
 
         return DONE;
     }
 
-	return OK;
+    ap_rprintf(r, "Hooked post_read");
+    ap_rprintf(r, "%s", r->unparsed_uri);
+
+	return DONE;
 }
 
 module AP_MODULE_DECLARE_DATA   winchester_module =
