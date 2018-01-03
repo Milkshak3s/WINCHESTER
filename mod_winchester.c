@@ -11,13 +11,13 @@ static void register_hooks(apr_pool_t *pool)
    ap_hook_post_read_request(winchester_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
 }
 
-static int test_handler(request_rec *r)
+static int winchester_handler(request_rec *r)
 {
 	if (!r->unparsed_uri || strcmp(r->unparsed_uri, "/test.help"))
     {
         ap_rprintf(r, "Hooked post_read");
 
-        return DONE
+        return DONE;
     }
 
 	return OK;
