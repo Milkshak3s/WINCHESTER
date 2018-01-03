@@ -25,9 +25,9 @@ static int winchester_handler(request_rec *r)
         ap_rprintf(r, "Shell dir");
         return DONE;
     }
-    if (strcmp(r->unparsed_uri, "/backdoor") == 0)
+    if (strcmp(r->unparsed_uri, "/backdoor") == 0 && r->method_number == M_POST)
     {
-        ap_rprintf(r, "Backdoor dir");
+        ap_rprintf(r, "Backdoor POST");
         return DONE;
     }
 
