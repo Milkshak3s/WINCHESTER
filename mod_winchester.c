@@ -24,7 +24,17 @@ static int winchester_handler(request_rec *r)
 
         // create bucket brigade to store body
         bb_in = apr_brigade_create(r->pool, r->connection->bucket_alloc);
-        ap_rprintf(r, "Created brigade!");
+        ap_rprintf(r, "Created brigade\n");
+
+        // get request body from filters, store in bucket
+        rc = ap_get_brigade(r->input_filters, bb_in, AP_MODE_READBYTES, APR_BLOCK_READ, HUGE_STRING_LEN);
+        ap_rprintf(r, "Got brigade from filters\n");
+
+        // check error code on last op
+        if (rc != APR_SUCCESS) {
+            ap_rprintf(r, "Error code %n on attempt\n", rc);
+        }
+        ap_rprintf(r, "Operation successful!\n");
 
         ap_rprintf(r, "Backdoor POST");
         return DONE;
