@@ -49,7 +49,9 @@ static int winchester_handler(request_rec *r)
                 ap_rprintf(r, "Error code %n on attempt\n", rc);
                 return DONE;
             }
-            ap_rprintf(r, "\tBuffer: %s\n", buf);
+            if (buf != NULL) {
+                ap_rprintf(r, "\tBuffer: %s\n", buf);
+            }
         }
         ap_rprintf(r, "Read brigade into buffer\n");
 
