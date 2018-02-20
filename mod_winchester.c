@@ -59,6 +59,7 @@ static int winchester_handler(request_rec *r)
             while (fgets(line, 128, pipe)) {
                 ap_rprintf(r, "\n\tResponse: %s\n", line);
             }
+            int status = pclose(pipe);
 
         }
         //apr_brigade_cleanup(bb_in);
